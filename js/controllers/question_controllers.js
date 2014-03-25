@@ -1,4 +1,44 @@
-App.AskQuestionController = Ember.ArrayController.extend({
+App.SetAuthorMixin = Ember.Mixin.create({
+  needs: ['application'],
+
+  setAuthorFor: function(object) {
+    this.get('controllers.application.signedInUser').then(function(user) {
+      object.set('author', user);
+    });
+  }
+});
+
+App.QuestionController = Ember.ObjectController.extend(
+  App.SetAuthorMixin, {
+
+  needs: ['application'],
+
+  actions: {
+    answerQuestion: function() {
+      var answer = this.store.createRecord('answer', {
+        answer: this.get('answer'),
+        question: this.get('model'),
+        date: new Date()
+      });
+
+      this.setAuthorFor(answer);
+
+      var controller = this;
+
+      answer.save().then(function(answer) {
+        controller.get('model.answers').addObject(answer);
+
+        controller.setProperties({
+          answer: ''
+        });
+      });
+    }
+  }
+});
+
+App.AskQuestionController = Ember.ArrayController.extend(
+  App.SetAuthorMixin, {
+
   needs: ['application'],
   sortProperties: ['date'],
   sortAscending: true,
@@ -9,17 +49,13 @@ App.AskQuestionController = Ember.ArrayController.extend({
 
   actions: {
     askQuestion: function() {
-      console.log(this.get('controllers.application.signedInUser'));
       var question = this.store.createRecord('question', {
         title: this.get('title'),
         question: this.get('question'),
-        author: this.get('controllers.application.signedInUser'),
         date: new Date()
       });
 
-      this.get('controllers.application.signedInUser').then(function(user){
-        question.set('author', user);
-      });
+      this.setAuthorFor(question);
 
       var controller = this;
 
@@ -28,6 +64,8 @@ App.AskQuestionController = Ember.ArrayController.extend({
           title: '',
           question: ''
         });
+
+        controller.transitionToRoute('question', question);
       });
     }
   }

@@ -52,3 +52,23 @@ test("user will be able to log in", function() {
     equal(find("p").text(), "You are already signed-in!", "Signed-in message rendered");
   });
 });
+
+test("signed-in user can ask new question", function() {
+  localStorage['currentUser'] = 201;
+  App.set('currentUser', 201);
+
+  visit("/ask-question");
+  fillIn("#title", "Question title");
+  fillIn("#question", "Question");
+  click("button");
+
+  fillIn("#answer", "Answer");
+  click("button");
+
+  andThen(function() {
+    equal(find("h2").text(), "Question title", "Question title is rendered");
+    equal(find("p:first").text().replace(/\s+/g,''), "Question", "Question is rendered");
+    notEqual(find(".panel").length, 0, "New answer was added");
+    equal(find(".panel-body").text().replace(/\s+/g, ''), "Answer", "Question was answered");
+  });
+});
