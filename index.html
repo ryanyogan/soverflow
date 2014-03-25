@@ -52,16 +52,23 @@
         <p>It is {{currentTime}}</p>
         <ul>
           {{#each}}
-            <li>
-              {{#link-to 'question' this}}
-                {{title}}
-              {{/link-to}}
-              (asked by {{author.fullname}})
-            </li>
+            {{question-preview question=this}}
           {{/each}}
         </ul>
       </div>
     </div>
+  </script>
+
+  <script type="text/x-handlebars" id="components/question-preview">
+    {{#link-to 'question' question}}
+      {{question.title}}
+    {{/link-to}}
+
+    {{#if hasAnswers}}
+    <span class="label label-default">{{answersCount}} {{pluralForm}}</span>
+    {{/if}}
+
+    (asked by {{question.author.fullname}})
   </script>
 
   <script type="text/x-handlebars" id="ask-question">
@@ -218,6 +225,7 @@
   <script src="js/controllers/application_controllers.js"></script>
   <script src="js/controllers/sign_in_controller.js"></script>
   <script src="js/controllers/question_controllers.js"></script>
+  <script src="js/components/question_components.js"></script>
   <!-- to activate the test runner, add the "?test" query string parameter -->
   <script src="tests/runner.js"></script>
 </body>
