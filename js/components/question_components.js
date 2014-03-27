@@ -11,5 +11,3 @@ App.QuestionPreviewComponent = Ember.Component.extend({
     return this.get('answersCount') > 0;
   }.property('answersCount')
 });
-
-new 98();
